@@ -131,8 +131,10 @@ class RedisSocket(object):
 class RedisSocketNB(SocketNB):
     def __init__(self, src, dst):
         super(RedisSocketNB, self).__init__(RedisSocket(src, dst))
-        self.send_queue = RedisQueue("%s:%s" % (src, dst))
-        self.recv_queue = RedisQueue("%s:%s" % (dst, src))
+        # Send messages to the specific lambda
+        self.send_queue = RedisQueue("%s" % dst)
+        # Receive all messages destined to me
+        self.recv_queue = RedisQueue("%s" % src)
 
     def _fill_recv_buf(self):
         pass
