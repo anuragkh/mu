@@ -22,7 +22,7 @@ if [ -z "$PORTNUM" ]; then
     PORTNUM=13579
 fi
 if [ -z "$STATEPORT" ]; then
-    STATEPORT=13337
+    STATEPORT=6379
 fi
 if [ -z "$STATETHREADS" ]; then
     STATETHREADS=24
