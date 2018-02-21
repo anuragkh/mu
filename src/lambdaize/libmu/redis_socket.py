@@ -69,16 +69,13 @@ class RedisSocketNB(SocketNB):
         pass
 
     def do_read(self):
-        rqlen = len(self.recv_queue)
-        print "RedisSocketNB.do_read(): LEN(%s)=%d" % (self.recv_queue.name(), rqlen)
-        self.want_handle = rqlen > 0
+        self.want_handle = len(self.recv_queue) > 0
 
     def enqueue(self, msg):
         self.send_queue.append(msg)
 
     def dequeue(self):
-        rqlen = len(self.recv_queue)
-        print "RedisSocketNB.dequeue(): LEN(%s)=%d" % (self.recv_queue.name(), rqlen)
+        self.want_handle = False
         return self.recv_queue.popleft()
 
     def update_flags(self):
