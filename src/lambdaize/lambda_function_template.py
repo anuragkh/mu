@@ -51,6 +51,9 @@ def get_input_state(vals):
     if Defs.debug:
         print "CLIENT received from neighbor: %s... (%d)" % (msg, len(data))
 
+    if msg[:6] != "STATE(":
+        print "Received unexpected message: %s" % msg
+        
     assert msg[:6] == "STATE("
     lind = 6
     rind = msg.find(')')
