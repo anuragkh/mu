@@ -78,7 +78,7 @@ class DummySocket(object):
 
 class RedisSocketNB(SocketNB):
     def __init__(self, src, dst, **redis_kwargs):
-        super(RedisSocketNB, self).__init__(RedisSocket(src, dst))
+        super(RedisSocketNB, self).__init__(DummySocket())
         db = redis.Redis(**redis_kwargs)
         # Send messages to the specific lambda
         self.send_queue = RedisQueue("%s" % dst, db)
