@@ -230,9 +230,6 @@ def do_connect(msg, vals):
         vals['cmdsock'].enqueue('FAIL(%s)' % str(cs))
         return True
     vals['stsock'] = cs
-
-    if len(tosend) > 0:
-        vals['stsock'].enqueue(tosend)
     vals['cmdsock'].enqueue('OK:CONNECT(%s)' % msg)
     return False
 
