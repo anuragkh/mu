@@ -141,6 +141,10 @@ if [ ! -d "$LIBMU_DIRECTORY" ]; then
     exit 1
 fi
 cp -R "$LIBMU_DIRECTORY" "$TMPDIR"
+wget --quiet https://github.com/excamera/excamera-static-bins/archive/master.zip
+unzip -qq master.zip
+mv excamera-static-bins-master/* $TMPDIR
+rm -rf excamera-static-bins-master/
 
 #
 # if we're allowing dynamic libraries, copy over the libraries

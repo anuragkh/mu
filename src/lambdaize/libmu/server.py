@@ -95,13 +95,9 @@ def _test_compute(kfDist, numParts):
 ###
 def server_launch(server_info, event, akid, secret):
     if event.get('addr') is None:
-        # figure out what the IP address of the interface talking to AWS is
-        # NOTE if you have different interfaces routing to different regions
-        #      this won't work. I'm assuming that's unlikely.
-        testsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        testsock.connect(("lambda." + server_info.regions[0] + ".amazonaws.com", 443))
-        event['addr'] = testsock.getsockname()[0]
-        testsock.close()
+        import requests
+        ip = requests.get("http://169.254.169.254/latest/meta-data/public-ipv4").content
+        event['addr'] = ip
 
     pid = os.fork()
     if pid == 0:

@@ -9,10 +9,12 @@ import boto3
 
 from libmu.defs import Defs
 from libmu.fd_wrapper import FDWrapper
+from libmu.redis_socket import RedisSocketNB
 from libmu.socket_nb import SocketNB
 import libmu.util
 
 s3_client = boto3.client('s3')
+
 
 ###
 #  set a value
@@ -38,8 +40,10 @@ def _do_set(msg, vals, to_int):
 
     return False
 
+
 do_set = lambda m, v: _do_set(m, v, False)
 do_seti = lambda m, v: _do_set(m, v, True)
+
 
 ###
 #  get a value
@@ -57,8 +61,10 @@ def _do_get(msg, vals, get_info):
 
     return False
 
+
 do_get = lambda m, v: _do_get(m, v, False)
 do_geti = lambda m, v: _do_get(m, v, True)
+
 
 ###
 #  dump entire vals dict
@@ -66,6 +72,7 @@ do_geti = lambda m, v: _do_get(m, v, True)
 def do_dump_vals(_, vals):
     vals['cmdsock'].enqueue('OK:DUMP_VALS:%s' % str(vals))
     return False
+
 
 ###
 #  run something in the background
@@ -111,6 +118,7 @@ def _background(runner, vals, queuemsg):
         sock.close()
         sys.exit(retval)
 
+
 ###
 #  tell the client to retrieve a segment from S3
 ###
@@ -132,6 +140,7 @@ def do_retrieve(msg, vals):
         return (donemsg, retval)
 
     return _background(ret_helper, vals, 'OK:RETRIEVING(%s/%s->%s)' % (bucket, key, filename))
+
 
 ###
 #  tell the client to upload a segment to s3
@@ -155,6 +164,7 @@ def do_upload(msg, vals):
 
     return _background(ret_helper, vals, 'OK:UPLOADING(%s->%s/%s)' % (filename, bucket, key))
 
+
 ###
 #  echo msg back to the server
 ###
@@ -162,12 +172,14 @@ def do_echo(msg, vals):
     vals['cmdsock'].enqueue('OK:ECHO(%s)' % msg)
     return False
 
+
 ###
 #  we've been told to quit
 ###
 def do_quit(_, vals):
     vals['cmdsock'].close()
     return True
+
 
 ###
 #  run the command
@@ -189,6 +201,7 @@ def do_run(msg, vals):
 
     return _background(ret_helper, vals, 'OK:RUNNING(%s)' % cmdstring)
 
+
 ###
 #  connect to peer lambda
 ###
@@ -201,8 +214,15 @@ def do_connect(msg, vals):
     try:
         (host, port, tosend) = msg.split(':', 2)
         port = int(port)
-        cs = libmu.util.connect_socket(host, port, vals.get('cacert'), vals.get('srvcrt'), vals.get('srvkey'))
-    except Exception as e: # pylint: disable=broad-except
+        parts = tosend.split(':', 3)
+
+        if len(parts) != 4 or parts[0] != "HELLO_STATE":
+            return None
+        src = "%s_%d" % (parts[1], int(parts[2]))
+        dst = "%s_%d" % (parts[1], int(parts[3]))
+
+        cs = RedisSocketNB(src, dst, host=host, port=port)
+    except Exception as e:  # pylint: disable=broad-except
         vals['cmdsock'].enqueue('FAIL(%s)' % str(e))
         return False
 
@@ -216,6 +236,7 @@ def do_connect(msg, vals):
     vals['cmdsock'].enqueue('OK:CONNECT(%s)' % msg)
     return False
 
+
 ###
 #  close connection to peer lambda
 ###
@@ -228,22 +249,25 @@ def do_close_connect(_, vals):
     vals['cmdsock'].enqueue('OK:CLOSE_CONNECT')
     return False
 
+
 ###
 #  dispatch to handler functions
 ###
-message_types = { 'set:': do_set
-                , 'seti:': do_seti
-                , 'get:': do_get
-                , 'geti:': do_geti
-                , 'dump_vals:': do_dump_vals
-                , 'retrieve:': do_retrieve
-                , 'upload:': do_upload
-                , 'echo:': do_echo
-                , 'quit:': do_quit
-                , 'run:': do_run
-                , 'connect:': do_connect
-                , 'close_connect:': do_close_connect
-                }
+message_types = {'set:': do_set
+    , 'seti:': do_seti
+    , 'get:': do_get
+    , 'geti:': do_geti
+    , 'dump_vals:': do_dump_vals
+    , 'retrieve:': do_retrieve
+    , 'upload:': do_upload
+    , 'echo:': do_echo
+    , 'quit:': do_quit
+    , 'run:': do_run
+    , 'connect:': do_connect
+    , 'close_connect:': do_close_connect
+                 }
+
+
 def handle_message(msg, vals):
     if Defs.debug:
         print "CLIENT HANDLING %s" % msg
@@ -256,20 +280,23 @@ def handle_message(msg, vals):
     vals['cmdsock'].enqueue("FAIL(no such command '%s')" % msg)
     return False
 
-message_responses = { 'set': 'OK:SET'
-                    , 'seti': 'OK:SETI'
-                    , 'get': 'OK:GET'
-                    , 'geti': 'OK:GETI'
-                    , 'dump_vals': 'OK:DUMP_VALS'
-                    , 'retrieve': 'OK:RETRIEV'
-                    , 'upload': 'OK:UPLOAD'
-                    , 'echo': 'OK:ECHO'
-                    , 'run': 'OK:R'
-                    , 'listen': 'OK:LISTEN'
-                    , 'close_listen': 'OK:CLOSE_LISTEN'
-                    , 'connect': 'OK:CONNECT'
-                    , 'close_connect': 'OK:CLOSE_CONNECT'
-                    }
+
+message_responses = {'set': 'OK:SET'
+    , 'seti': 'OK:SETI'
+    , 'get': 'OK:GET'
+    , 'geti': 'OK:GETI'
+    , 'dump_vals': 'OK:DUMP_VALS'
+    , 'retrieve': 'OK:RETRIEV'
+    , 'upload': 'OK:UPLOAD'
+    , 'echo': 'OK:ECHO'
+    , 'run': 'OK:R'
+    , 'listen': 'OK:LISTEN'
+    , 'close_listen': 'OK:CLOSE_LISTEN'
+    , 'connect': 'OK:CONNECT'
+    , 'close_connect': 'OK:CLOSE_CONNECT'
+                     }
+
+
 def expected_response(msg):
     cmd = msg.split(':', 1)[0]
     expected = message_responses.get(cmd, "OK")

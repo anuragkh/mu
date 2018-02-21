@@ -199,7 +199,7 @@ class XCEncPreRunState(CommandListState):
             tell_pass_num = effActNum
 
         send_statefile = 1
-        dist_from_end = (kfDist if kfDist is not None else ServerInfo.num_passes) - effActNum
+        dist_from_end = (kfDist if kfDist is not None else ServerInfo.tot_passes) - effActNum
         if dist_from_end == 1 or (kfDist is not None and pass_num == 1 and effActNum != 1):
             send_statefile = 0
 
