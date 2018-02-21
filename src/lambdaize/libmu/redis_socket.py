@@ -35,19 +35,11 @@ class RedisQueue(object):
 
     def pop(self):
         """Remove and return a msg from the right side of the queue."""
-        msg = self.__db.rpop(self.key)
-        if msg:
-            return msg
-        else:
-            raise IndexError()
+        return self.__db.rpop(self.key)
 
     def popleft(self):
         """Remove and return a msg from the left side of the queue."""
-        msg = self.__db.lpop(self.key)
-        if msg:
-            return msg
-        else:
-            raise IndexError()
+        return self.__db.lpop(self.key)
 
 
 class DummySocket(object):
@@ -79,6 +71,12 @@ class RedisSocketNB(SocketNB):
 
     def do_read(self):
         self.want_handle = len(self.recv_queue) > 0
+
+    def enqueue(self, msg):
+        self.send_queue.append(msg)
+
+    def dequeue(self):
+        return self.recv_queue.popleft()
 
     def update_flags(self):
         pass
