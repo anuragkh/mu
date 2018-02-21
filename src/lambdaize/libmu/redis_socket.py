@@ -61,16 +61,17 @@ class RedisSocketNB(SocketNB):
     def __init__(self, src, dst, sockfd, **redis_kwargs):
         super(RedisSocketNB, self).__init__(DummySocket(sockfd))
         db = redis.Redis(**redis_kwargs)
-        # Send messages to the specific lambda
-        self.send_queue = RedisQueue("%s" % dst, db)
-        # Receive all messages destined to me
-        self.recv_queue = RedisQueue("%s" % src, db)
+        self.send_queue = RedisQueue(dst, db)
+        self.recv_queue = RedisQueue(src, db)
+        print "Redis socket between %s <-> %s" % (src, dst)
 
     def _fill_recv_buf(self):
         pass
 
     def do_read(self):
-        self.want_handle = len(self.recv_queue) > 0
+        rqlen = len(self.recv_queue)
+        print "RedisSocketNB.do_read(): LEN(%s)=%d" % (self.recv_queue.name(), rqlen)
+        self.want_handle = rqlen > 0
 
     def enqueue(self, msg):
         self.send_queue.append(msg)
