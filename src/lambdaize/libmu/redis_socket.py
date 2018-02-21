@@ -27,39 +27,29 @@ class RedisQueue(object):
 
     def append(self, msg):
         """Add msg to the right side of the queue."""
+        print "RedisQueue: append msg (%s)" % msg
         self.__db.rpush(self.key, msg)
 
     def appendleft(self, msg):
         """Add msg to the left side of the queue."""
+        print "RedisQueue: appendleft msg (%s)" % msg
         self.__db.lpush(self.key, msg)
 
-    def pop(self, block=False, timeout=None):
-        """Remove and return a msg from the right side of the queue.
-
-        If optional args block is true and timeout is None, block
-        if necessary until an msg is available."""
-        if block:
-            msg = self.__db.brpop(self.key, timeout=timeout)
-        else:
-            msg = self.__db.rpop(self.key)
-
+    def pop(self):
+        """Remove and return a msg from the right side of the queue."""
+        msg = self.__db.rpop(self.key)
         if msg:
-            return msg[1]
+            print "RedisQueue: pop msg (%s)" % msg
+            return msg
         else:
             raise IndexError()
 
-    def popleft(self, block=False, timeout=None):
-        """Remove and return a msg from the left side of the queue.
-
-        If optional args block is true and timeout is None, block
-        if necessary until an msg is available."""
-        if block:
-            msg = self.__db.blpop(self.key, timeout=timeout)
-        else:
-            msg = self.__db.lpop(self.key)
-
+    def popleft(self):
+        """Remove and return a msg from the left side of the queue."""
+        msg = self.__db.lpop(self.key)
         if msg:
-            return msg[1]
+            print "RedisQueue: popleft msg (%s)" % msg
+            return msg
         else:
             raise IndexError()
 
