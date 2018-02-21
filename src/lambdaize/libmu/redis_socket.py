@@ -77,6 +77,8 @@ class RedisSocketNB(SocketNB):
         self.send_queue.append(msg)
 
     def dequeue(self):
+        rqlen = len(self.recv_queue)
+        print "RedisSocketNB.dequeue(): LEN(%s)=%d" % (self.recv_queue.name(), rqlen)
         return self.recv_queue.popleft()
 
     def update_flags(self):

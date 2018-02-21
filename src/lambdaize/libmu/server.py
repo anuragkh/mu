@@ -111,7 +111,8 @@ def server_launch(server_info, event, akid, secret):
 #  set up server listen sock
 ###
 def setup_server_listen(server_info):
-    return libmu.util.listen_socket('0.0.0.0', server_info.port_number, server_info.cacert, server_info.srvcrt, server_info.srvkey, server_info.num_parts + 10)
+    return libmu.util.listen_socket('0.0.0.0', server_info.port_number, server_info.cacert, server_info.srvcrt,
+                                    server_info.srvkey, server_info.num_parts + getattr(server_info, 'overprovision', 0))
 
 ###
 #  server mainloop
