@@ -37,7 +37,6 @@ class RedisQueue(object):
         """Remove and return a msg from the right side of the queue."""
         msg = self.__db.rpop(self.key)
         if msg:
-            print "RedisQueue: pop msg (%s)" % msg
             return msg
         else:
             raise IndexError()
@@ -46,7 +45,6 @@ class RedisQueue(object):
         """Remove and return a msg from the left side of the queue."""
         msg = self.__db.lpop(self.key)
         if msg:
-            print "RedisQueue: popleft msg (%s)" % msg
             return msg
         else:
             raise IndexError()

@@ -46,7 +46,6 @@ def finished_run(msg, vals):
 ###
 def get_input_state(vals):
     indata = vals['stsock'].dequeue()
-    print "CLIENT received from neighbor: %s..." % indata
     (msg, data) = indata.split(':', 1)
 
     if Defs.debug:
