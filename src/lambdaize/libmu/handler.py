@@ -221,7 +221,7 @@ def do_connect(msg, vals):
         src = "%s_%d" % (parts[1], int(parts[2]))
         dst = "%s_%d" % (parts[1], int(parts[3]))
 
-        cs = RedisSocketNB(src, dst, host=host, port=port)
+        cs = RedisSocketNB(src, dst, vals['cmdsock'].fileno(), host=host, port=port)
     except Exception as e:  # pylint: disable=broad-except
         vals['cmdsock'].enqueue('FAIL(%s)' % str(e))
         return False

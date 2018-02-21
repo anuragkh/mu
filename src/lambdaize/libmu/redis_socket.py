@@ -65,8 +65,11 @@ class RedisQueue(object):
 
 
 class DummySocket(object):
+    def __init__(self, sockfd):
+        self.fd = sockfd
+
     def fileno(self):
-        return sys.__stdout__.fileno()
+        return self.fd
 
     def close(self):
         pass
@@ -77,8 +80,8 @@ class DummySocket(object):
 
 
 class RedisSocketNB(SocketNB):
-    def __init__(self, src, dst, **redis_kwargs):
-        super(RedisSocketNB, self).__init__(DummySocket())
+    def __init__(self, src, dst, sockfd, **redis_kwargs):
+        super(RedisSocketNB, self).__init__(DummySocket(sockfd))
         db = redis.Redis(**redis_kwargs)
         # Send messages to the specific lambda
         self.send_queue = RedisQueue("%s" % dst, db)
