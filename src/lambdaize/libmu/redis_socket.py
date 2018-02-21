@@ -27,12 +27,10 @@ class RedisQueue(object):
 
     def append(self, msg):
         """Add msg to the right side of the queue."""
-        print "RedisQueue: append msg (%s)" % msg
         self.__db.rpush(self.key, msg)
 
     def appendleft(self, msg):
         """Add msg to the left side of the queue."""
-        print "RedisQueue: appendleft msg (%s)" % msg
         self.__db.lpush(self.key, msg)
 
     def pop(self):
