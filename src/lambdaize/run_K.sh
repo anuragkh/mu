@@ -1,22 +1,20 @@
 #!/bin/bash
 
-. env_setup
-. k_fn_name
+FN_NAME=xc-enc_14e88
+REGION="us-east-1"
 
-if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
-    echo "Usage: $0 kf_dist n_workers n_offset y_val"
-    exit 1
-fi
-
-KFDIST=$1
-NWORKERS=$2
-NOFFSET=$3
-YVAL=$4
+public_ip=$(wget -qO - http://169.254.169.254/latest/meta-data/public-ipv4)
+STATEHOST=${1:-"$public_ip"}
+KFDIST=${2:-"6"}
+NWORKERS=${3:-"16"}
+NOFFSET=${4:-"0"}
+YVAL=${5:-"30"}
+HOST="$public_ip"
 if [ -z "$PORTNUM" ]; then
     PORTNUM=13579
 fi
 if [ -z "$STATEPORT" ]; then
-    STATEPORT=13330
+    STATEPORT=13337
 fi
 if [ -z "$STATETHREADS" ]; then
     STATETHREADS=24
@@ -71,30 +69,30 @@ if [ -z "$SSIM_ONLY" ]; then
         -Y ${YVAL} \
         -K ${KFDIST} \
         -v sintel-4k-y4m"${VID_SUFFIX}" \
-        -b excamera-${REGION} \
+        -b elasticmem-datasets \
         -r ${REGION} \
         -l ${FN_NAME} \
         -t ${PORTNUM} \
-        -h ${REGION}.x.tita.nyc \
+        -h ${HOST} \
         -T ${STATEPORT} \
         -R ${STATETHREADS} \
-        -H ${REGION}.x.tita.nyc \
+        -H ${STATEHOST} \
         -O logs/${XCENC_EXEC}_transitions_${LOGFILESUFFIX}.log
 fi
 
-if [ $? = 0 ] && [ ! -z "${UPLOAD}" ]; then
-    ./${DUMP_EXEC}_server.py \
-        ${DEBUG} \
-        -n ${NWORKERS} \
-        -o ${NOFFSET} \
-        -X $((${NWORKERS} / 2)) \
-        -Y ${YVAL} \
-        -K ${KFDIST} \
-        -v sintel-4k-y4m${FRAME_STR} \
-        -b excamera-${REGION} \
-        -r ${REGION} \
-        -l ${FN_NAME} \
-        -t ${PORTNUM} \
-        -h ${REGION}.x.tita.nyc \
-        -O logs/${DUMP_EXEC}_transitions_${LOGFILESUFFIX}.log
-fi
+#if [ $? = 0 ] && [ ! -z "${UPLOAD}" ]; then
+#    ./${DUMP_EXEC}_server.py \
+#        ${DEBUG} \
+#        -n ${NWORKERS} \
+#        -o ${NOFFSET} \
+#        -X $((${NWORKERS} / 2)) \
+#        -Y ${YVAL} \
+#        -K ${KFDIST} \
+#        -v sintel-4k-y4m${FRAME_STR} \
+#        -b excamera-${REGION} \
+#        -r ${REGION} \
+#        -l ${FN_NAME} \
+#        -t ${PORTNUM} \
+#        -h ${REGION}.x.tita.nyc \
+#        -O logs/${DUMP_EXEC}_transitions_${LOGFILESUFFIX}.log
+#fi
