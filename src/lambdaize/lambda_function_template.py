@@ -235,7 +235,6 @@ def lambda_handler(event, _):
     if mode == 0:
         return handler.do_run('', {'event': event})
 
-    print "Connecting to coordinator @ %s:%d" % (addr, port)
     s = util.connect_socket(addr, port, cacert, srvcrt, srvkey)
     if not isinstance(s, SocketNB):
         return str(s)
