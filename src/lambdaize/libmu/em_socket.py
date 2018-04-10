@@ -55,9 +55,11 @@ class EMSocketNB(SocketNB):
     def __init__(self, src, dst, sockfd, **em_kwargs):
         super(EMSocketNB, self).__init__(DummySocket(sockfd))
         self.em = ElasticMemClient(**em_kwargs)
-        self.path = '/excamera/%s_%s' % (src, dst)
-        self.kv = self.em.open(self.path, '/tmp')
-        self.notif = self.em.open_listener(self.path).subscribe(['put'])
+        self.send_path = '/excamera/%s_%s' % (src, dst)
+        self.recv_path = '/excamera/%s_%s' % (dst, src)
+        self.kv = self.em.open(self.send_path)
+        self.em.fs.create(self.recv_path, '/tmp')
+        self.notif = self.em.open_listener(self.recv_path).subscribe(['put'])
         self.want_handle = False
         print "EM socket between %s <-> %s" % (src, dst)
 
@@ -72,7 +74,7 @@ class EMSocketNB(SocketNB):
 
     def dequeue(self):
         self.want_handle = False
-        return self.notif.get_notification()
+        return self.notif.get_notification().data
 
     def update_flags(self):
         pass
