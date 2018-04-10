@@ -27,4 +27,6 @@ Makefile.in
 /stamp-h1
 /compile
 /test-driver
-
+cmake-build-debug
+.idea
+CMakeLists.txt
