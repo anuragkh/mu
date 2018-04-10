@@ -1,23 +1,20 @@
 #!/bin/bash
 
-export FN_NAME="xc-enc_CnF9QOeX"
-export REGION="us-east-1"
-export PUBLIC_IP=`curl --silent http://169.254.169.254/latest/meta-data/public-ipv4`
+FN_NAME="xc-enc_CnF9QOeX"
+REGION="us-east-1"
+public_ip=`wget -qO - http://169.254.169.254/latest/meta-data/public-ipv4`
 echo "IP=[$PUBLIC_IP]"
 echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
 echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
 echo "AWS_ROLE=$AWS_ROLE"
 
-if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
-    echo "Usage: $0 kf_dist n_workers n_offset y_val"
-    exit 1
-fi
+STATEHOST=${1:-"$public_ip"}
+KFDIST=${2:-"6"}
+NWORKERS=${3:-"16"}
+NOFFSET=${4:-"0"}
+YVAL=${5:-"30"}
+HOST="$public_ip"
 
-DEBUG=1
-KFDIST=$1
-NWORKERS=$2
-NOFFSET=$3
-YVAL=$4
 if [ -z "$PORTNUM" ]; then
     PORTNUM=13579
 fi
@@ -98,10 +95,10 @@ if [ -z "$SSIM_ONLY" ]; then
         -l ${FN_NAME} \
         -T ${STATEPORT} \
         -R ${STATETHREADS} \
-        -H ${PUBLIC_IP} \
+        -H ${STATEHOST} \
         -O logs/${XCENC_EXEC}_transitions_${LOGFILESUFFIX}.log \
-	-t ${PORTNUM} \
-	-h ${PUBLIC_IP}
+        -t ${PORTNUM} \
+        -h ${HOST}
 fi
 
 #if [ $? = 0 ] && [ ! -z "${UPLOAD}" ]; then
