@@ -9,7 +9,7 @@ import boto3
 
 from libmu.defs import Defs
 from libmu.fd_wrapper import FDWrapper
-from libmu.redis_socket import RedisSocketNB
+from libmu.em_socket import EMSocketNB
 from libmu.socket_nb import SocketNB
 import libmu.util
 
@@ -221,7 +221,7 @@ def do_connect(msg, vals):
         src = "%s_%d" % (parts[1], int(parts[2]))
         dst = "%s_%d" % (parts[1], int(parts[3]))
 
-        cs = RedisSocketNB(src, dst, vals['cmdsock'].fileno(), host=host, port=port)
+        cs = EMSocketNB(src, dst, vals['cmdsock'].fileno(), host=host, port=port)
     except Exception as e:  # pylint: disable=broad-except
         vals['cmdsock'].enqueue('FAIL(%s)' % str(e))
         return False

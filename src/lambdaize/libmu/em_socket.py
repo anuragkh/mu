@@ -3,15 +3,11 @@
 import sys
 import redis
 
+from elasticmem import ElasticMemClient
 from libmu.socket_nb import SocketNB
 
 
 class RedisQueue(object):
-    """ Simple message queue with Redis backend.
-
-    Based on http://peter-hoffmann.com/2012/python-simple-queue-redis-queue.html
-    """
-
     def __init__(self, name, db):
         """The default connection parameters are: host='localhost', port=6379, db=0"""
         self.__db = db
@@ -19,8 +15,6 @@ class RedisQueue(object):
 
     def __len__(self):
         return self.__db.llen(self.key)
-
-    # TODO: Add Redis cleanup; ideally we would delete the key corresponding to this queue
 
     def name(self):
         return self.key
@@ -57,26 +51,28 @@ class DummySocket(object):
         pass
 
 
-class RedisSocketNB(SocketNB):
-    def __init__(self, src, dst, sockfd, **redis_kwargs):
-        super(RedisSocketNB, self).__init__(DummySocket(sockfd))
-        db = redis.Redis(**redis_kwargs)
-        self.send_queue = RedisQueue(dst, db)
-        self.recv_queue = RedisQueue(src, db)
-        print "Redis socket between %s <-> %s" % (src, dst)
+class EMSocketNB(SocketNB):
+    def __init__(self, src, dst, sockfd, **em_kwargs):
+        super(EMSocketNB, self).__init__(DummySocket(sockfd))
+        self.em = ElasticMemClient(**em_kwargs)
+        self.path = '/excamera/%s_%s' % (src, dst)
+        self.kv = self.em.open(self.path, '/tmp')
+        self.notif = self.em.open_listener(self.path).subscribe(['put'])
+        self.want_handle = False
+        print "EM socket between %s <-> %s" % (src, dst)
 
     def _fill_recv_buf(self):
         pass
 
     def do_read(self):
-        self.want_handle = len(self.recv_queue) > 0
+        self.want_handle = self.notif.has_notification()
 
     def enqueue(self, msg):
-        self.send_queue.append(msg)
+        self.kv.put(msg, '')
 
     def dequeue(self):
         self.want_handle = False
-        return self.recv_queue.popleft()
+        return self.notif.get_notification()
 
     def update_flags(self):
         pass
