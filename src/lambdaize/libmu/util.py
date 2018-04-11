@@ -2,6 +2,7 @@
 
 import random
 import socket
+import time
 import traceback
 
 from OpenSSL import SSL, crypto
@@ -37,7 +38,18 @@ def connect_socket(addr, port, cacert, srvcrt, srvkey):
     # connect to the master for orders
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-    s.connect((addr, port))
+
+    for attempt in range(10):
+        try:
+            s.connect((addr, port))
+        except socket.error, exc:
+            print "WARN Attempt#%d: socket.error %s (%s:%d)" % (attempt, exc, addr, port)
+            time.sleep(0.1)
+        else:
+            break
+    else:
+        print "ERROR failed to connect to %s:%d" % (addr, port)
+        raise RuntimeError("Could not connect to %s:%d" % (addr, port))
 
     # if we have a cacert, this means we should use SSL for this connection
     if cacert is not None:
