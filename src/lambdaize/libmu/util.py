@@ -46,7 +46,7 @@ def connect_socket(addr, port, cacert, srvcrt, srvkey):
         except socket.error, exc:
             print "WARN Attempt#%d: socket.error %s (%s:%d)" % (attempt, exc, addr, port)
             time.sleep(sleep_time)
-            sleep_time *= 2
+            sleep_time *= 3
         else:
             break
     else:
