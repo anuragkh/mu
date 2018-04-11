@@ -5,6 +5,7 @@ import os
 import select
 import shutil
 import socket
+import sys
 import tempfile
 import zlib
 
@@ -238,8 +239,7 @@ def lambda_handler(event, _):
     try:
         s = util.connect_socket(addr, port, cacert, srvcrt, srvkey)
     except RuntimeError:
-        print "ERROR Could not connect to %s:%d" % (addr, port)
-        raise
+        sys.exit(0)
     if not isinstance(s, SocketNB):
         return str(s)
     vals['cmdsock'] = s
@@ -268,7 +268,6 @@ def lambda_handler(event, _):
 
         # if the command sock is dead, we are dead
         if vals.get('cmdsock') is None:
-            print "ERROR cmdsock is dead"
             break
 
         ### cmdsock
