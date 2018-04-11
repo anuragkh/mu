@@ -1,8 +1,5 @@
 #!/usr/bin/python
 
-import sys
-import redis
-
 from elasticmem import ElasticMemClient
 from libmu.socket_nb import SocketNB
 
