@@ -52,14 +52,12 @@ class DummySocket(object):
 class EMSocketNB(SocketNB):
     def __init__(self, send_path, recv_path, sockfd, host):
         super(EMSocketNB, self).__init__(DummySocket(sockfd))
-        print "Connecting to directory server @ %s" % host
         self.em = ElasticMemClient(host)
         self.send_path = send_path
         self.recv_path = recv_path
 
-        print "Creating/opening"
         try:
-            self.kv = self.em.create(self.recv_path, '/tmp')
+            self.kv = self.em.create(self.send_path, '/tmp')
         except DirectoryServiceException:
             self.kv = self.em.open(self.send_path)
 
@@ -69,7 +67,7 @@ class EMSocketNB(SocketNB):
             pass
         self.notif = self.em.open_listener(self.recv_path).subscribe(['put'])
         self.want_handle = False
-        print "EM socket send %s, recv %s" % (send_path, recv_path)
+        print "EM socket send_path=%s, recv_path=%s" % (send_path, recv_path)
 
     def _fill_recv_buf(self):
         pass
