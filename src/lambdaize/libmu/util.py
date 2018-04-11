@@ -40,7 +40,7 @@ def connect_socket(addr, port, cacert, srvcrt, srvkey):
     s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
     sleep_time = 0.1
-    for attempt in range(6):
+    for attempt in range(10):
         try:
             s.connect((addr, port))
         except socket.error, exc:
@@ -48,6 +48,7 @@ def connect_socket(addr, port, cacert, srvcrt, srvkey):
             time.sleep(sleep_time)
             sleep_time *= 3
         else:
+            print "INFO Successfully connected to %s:%d on attempt %d" % (addr, port, attempt)
             break
     else:
         print "ERROR failed to connect to %s:%d" % (addr, port)
