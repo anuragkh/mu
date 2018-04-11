@@ -235,7 +235,11 @@ def lambda_handler(event, _):
     if mode == 0:
         return handler.do_run('', {'event': event})
 
-    s = util.connect_socket(addr, port, cacert, srvcrt, srvkey)
+    try:
+        s = util.connect_socket(addr, port, cacert, srvcrt, srvkey)
+    except RuntimeError:
+        print "ERROR Could not connect to %s:%d" % (addr, port)
+        raise
     if not isinstance(s, SocketNB):
         return str(s)
     vals['cmdsock'] = s

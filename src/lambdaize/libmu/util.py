@@ -51,7 +51,6 @@ def connect_socket(addr, port, cacert, srvcrt, srvkey):
             print "INFO Successfully connected to %s:%d on attempt %d" % (addr, port, attempt)
             break
     else:
-        print "ERROR failed to connect to %s:%d" % (addr, port)
         raise RuntimeError("Could not connect to %s:%d" % (addr, port))
 
     # if we have a cacert, this means we should use SSL for this connection
