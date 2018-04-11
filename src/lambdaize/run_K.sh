@@ -1,11 +1,11 @@
 #!/bin/bash
 
-FN_NAME=xc-enc_JScR57SG
+FN_NAME=xc-enc_zYNLyfO0
 REGION="us-east-1"
 
 public_ip=$(wget -qO - http://169.254.169.254/latest/meta-data/public-ipv4)
 STATEHOST=${1:-"$public_ip"}
-KFDIST=${2:-"6"}
+KFDIST=${2:-"16"}
 NWORKERS=${3:-"16"}
 NOFFSET=${4:-"0"}
 YVAL=${5:-"30"}
