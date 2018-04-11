@@ -40,11 +40,10 @@ def connect_socket(addr, port, cacert, srvcrt, srvkey):
     s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
     sleep_time = 0.1
-    for attempt in range(6):
+    for attempt in range(3):
         try:
             s.connect((addr, port))
         except socket.error, exc:
-            print "WARN Attempt#%d: socket.error %s (%s:%d)" % (attempt, exc, addr, port)
             time.sleep(sleep_time)
             sleep_time *= 3
         else:
