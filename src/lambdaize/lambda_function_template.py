@@ -45,26 +45,26 @@ def finished_run(msg, vals):
 ###
 #  get state file from stsock
 ###
-def get_input_state(vals):
-    indata = vals['stsock'].dequeue()
-    (msg, data) = indata.split(':', 1)
-
-    if Defs.debug:
-        print "CLIENT received from neighbor: %s... (%d)" % (msg, len(data))
-
-    if msg[:6] != "STATE(":
-        print "Received unexpected message: %s" % msg
-
-    assert msg[:6] == "STATE("
-    lind = 6
-    rind = msg.find(')')
-    statenum = int(msg[lind:rind])
-
-    with open(vals['_tmpdir'] + "/temp.state", 'w') as f:
-        f.write(zlib.decompress(data))
-
-    # NOTE we write to a tmpfile and rename because renaming is atomic!
-    os.rename(vals['_tmpdir'] + "/temp.state", vals['_tmpdir'] + "/%d.state" % statenum)
+# def get_input_state(vals):
+#     indata = vals['stsock'].dequeue()
+#     (msg, data) = indata.split(':', 1)
+#
+#     if Defs.debug:
+#         print "CLIENT received from neighbor: %s... (%d)" % (msg, len(data))
+#
+#     if msg[:6] != "STATE(":
+#         print "Received unexpected message: %s" % msg
+#
+#     assert msg[:6] == "STATE("
+#     lind = 6
+#     rind = msg.find(')')
+#     statenum = int(msg[lind:rind])
+#
+#     with open(vals['_tmpdir'] + "/temp.state", 'w') as f:
+#         f.write(zlib.decompress(data))
+#
+#     # NOTE we write to a tmpfile and rename because renaming is atomic!
+#     os.rename(vals['_tmpdir'] + "/temp.state", vals['_tmpdir'] + "/%d.state" % statenum)
 
 ###
 #  figure out which sockets need to be selected
@@ -301,9 +301,9 @@ def lambda_handler(event, _):
                 if outmsg[:12] == "OK:RETVAL(0)":
                     finished_run(outmsg, vals)
 
-        if vals.get('stsock') is not None and vals['stsock'].has_data():
+        # if vals.get('stsock') is not None and vals['stsock'].has_data():
             # handle receiving new state file from previous lambda
-            get_input_state(vals)
+        #    get_input_state(vals)
 
     (afds, _, _) = get_arwsocks(vals)
     for a in afds:

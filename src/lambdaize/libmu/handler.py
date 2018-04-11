@@ -4,6 +4,7 @@ import os
 import subprocess
 import sys
 import traceback
+import zlib
 
 import boto3
 
@@ -211,6 +212,20 @@ def do_connect(msg, vals):
         vals['cmdsock'].enqueue("FAIL(already connected)")
         return False
 
+    class NewDataCallback:
+        def __init__(self, tmp_dir):
+            self.tmp_dir = tmp_dir
+
+        def __call__(self, notif):
+            (msg, data) = notif.data.split(':', 1)
+            statenum = int(msg[6:msg.find(')')])
+
+            with open(self.tmp_dir + "/temp.state", 'w') as f:
+                f.write(zlib.decompress(data))
+
+            # NOTE we write to a tmpfile and rename because renaming is atomic!
+            os.rename(self.tmp_dir + "/temp.state", self.tmp_dir + "/%d.state" % statenum)
+
     try:
         (host, port, tosend) = msg.split(':', 2)
         parts = tosend.split(':', 3)
@@ -220,7 +235,7 @@ def do_connect(msg, vals):
         to_path = "/excamera/%s/%d" % (parts[1], int(parts[3]))
         from_path = "/excamera/%s/%d" % (parts[1], int(parts[2]))
 
-        cs = EMSocketNB(to_path, from_path, vals['cmdsock'].fileno(), host)
+        cs = EMSocketNB(to_path, from_path, NewDataCallback(vals['_tmpdir']), host)
     except Exception as e:  # pylint: disable=broad-except
         vals['cmdsock'].enqueue('FAIL(%s)' % str(e))
         return False

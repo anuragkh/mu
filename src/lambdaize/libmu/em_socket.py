@@ -21,8 +21,8 @@ class DummySocket(object):
 
 
 class EMSocketNB(SocketNB):
-    def __init__(self, send_path, recv_path, sockfd, host):
-        super(EMSocketNB, self).__init__(DummySocket(sockfd))
+    def __init__(self, send_path, recv_path, callback, host):
+        super(EMSocketNB, self).__init__(DummySocket(0))
         self.em = ElasticMemClient(host)
         self.send_path = send_path
         self.recv_path = recv_path
@@ -36,7 +36,7 @@ class EMSocketNB(SocketNB):
             self.em.fs.create(self.recv_path, '/tmp')
         except DirectoryServiceException:
             pass
-        self.notif = self.em.open_listener(self.recv_path).subscribe(['put'])
+        self.notif = self.em.open_listener(self.recv_path, callback).subscribe(['put'])
         self.want_handle = False
 
     def _fill_recv_buf(self):
