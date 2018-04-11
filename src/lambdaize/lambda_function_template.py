@@ -70,7 +70,7 @@ def get_input_state(vals):
 ###
 def get_arwsocks(vals):
     # asocks is all extant sockets
-    socknames = ['cmdsock', 'stsock']
+    socknames = ['cmdsock']
     asocks = [ s for s in [ vals.get(n) for n in socknames ] if s is not None ] + \
              [ info[1] for info in vals.setdefault('runinfo', []) ]
 
@@ -264,6 +264,7 @@ def lambda_handler(event, _):
 
         # if the command sock is dead, we are dead
         if vals.get('cmdsock') is None:
+            print "ERROR cmdsock is dead"
             break
 
         ### cmdsock
@@ -297,7 +298,7 @@ def lambda_handler(event, _):
                 if outmsg[:12] == "OK:RETVAL(0)":
                     finished_run(outmsg, vals)
 
-        if vals.get('stsock') is not None and vals['stsock'].want_handle:
+        if vals.get('stsock') is not None and vals['stsock'].has_data():
             # handle receiving new state file from previous lambda
             get_input_state(vals)
 

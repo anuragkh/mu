@@ -44,14 +44,16 @@ class EMSocketNB(SocketNB):
         pass
 
     def do_read(self):
-        self.want_handle = self.notif.has_notification()
+        pass
 
     def enqueue(self, msg):
         self.kv.put(msg, '')
 
     def dequeue(self):
-        self.want_handle = False
         return self.notif.get_notification().data
+
+    def has_data(self):
+        return self.notif.has_notification()
 
     def update_flags(self):
         pass
