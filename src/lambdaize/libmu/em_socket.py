@@ -52,6 +52,7 @@ class DummySocket(object):
 class EMSocketNB(SocketNB):
     def __init__(self, send_path, recv_path, sockfd, host, port):
         super(EMSocketNB, self).__init__(DummySocket(sockfd))
+        print "Connecting to directory server @ %s:%d" % (host, port)
         self.em = ElasticMemClient(host, port)
         self.send_path = send_path
         self.recv_path = recv_path
