@@ -5,35 +5,6 @@ from elasticmem import DirectoryServiceException
 from libmu.socket_nb import SocketNB
 
 
-class RedisQueue(object):
-    def __init__(self, name, db):
-        """The default connection parameters are: host='localhost', port=6379, db=0"""
-        self.__db = db
-        self.key = name
-
-    def __len__(self):
-        return self.__db.llen(self.key)
-
-    def name(self):
-        return self.key
-
-    def append(self, msg):
-        """Add msg to the right side of the queue."""
-        self.__db.rpush(self.key, msg)
-
-    def appendleft(self, msg):
-        """Add msg to the left side of the queue."""
-        self.__db.lpush(self.key, msg)
-
-    def pop(self):
-        """Remove and return a msg from the right side of the queue."""
-        return self.__db.rpop(self.key)
-
-    def popleft(self):
-        """Remove and return a msg from the left side of the queue."""
-        return self.__db.lpop(self.key)
-
-
 class DummySocket(object):
     def __init__(self, sockfd):
         self.fd = sockfd
