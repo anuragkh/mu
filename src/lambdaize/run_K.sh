@@ -8,7 +8,7 @@ STATEHOST=${1:-"$public_ip"}
 KFDIST=${2:-"16"}
 NWORKERS=${3:-"16"}
 NOFFSET=${4:-"0"}
-YVAL=${5:-"30"}
+YVAL=${5:-"10"}
 HOST="$public_ip"
 
 echo "IP=[$public_ip]"
