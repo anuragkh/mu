@@ -52,9 +52,9 @@ class DummySocket(object):
 
 
 class EMSocketNB(SocketNB):
-    def __init__(self, src, dst, sockfd, **em_kwargs):
+    def __init__(self, src, dst, sockfd, host, port):
         super(EMSocketNB, self).__init__(DummySocket(sockfd))
-        self.em = ElasticMemClient(**em_kwargs)
+        self.em = ElasticMemClient(host, port)
         self.send_path = '/excamera/%s_%s' % (src, dst)
         self.recv_path = '/excamera/%s_%s' % (dst, src)
         self.kv = self.em.open(self.send_path)
