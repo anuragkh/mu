@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from elasticmem import ElasticMemClient
+from elasticmem import DirectoryServiceException
 from libmu.socket_nb import SocketNB
 
 
@@ -49,16 +50,22 @@ class DummySocket(object):
 
 
 class EMSocketNB(SocketNB):
-    def __init__(self, src, dst, sockfd, host, port):
+    def __init__(self, send_path, recv_path, sockfd, host, port):
         super(EMSocketNB, self).__init__(DummySocket(sockfd))
         self.em = ElasticMemClient(host, port)
-        self.send_path = '/excamera/%s_%s' % (src, dst)
-        self.recv_path = '/excamera/%s_%s' % (dst, src)
-        self.kv = self.em.open(self.send_path)
-        self.em.fs.create(self.recv_path, '/tmp')
+        self.send_path = send_path
+        self.recv_path = recv_path
+        try:
+            self.kv = self.em.create(self.recv_path, '/tmp')
+        except DirectoryServiceException:
+            self.kv = self.em.open(self.send_path)
+        try:
+            self.em.fs.create(self.recv_path, '/tmp')
+        except DirectoryServiceException:
+            pass
         self.notif = self.em.open_listener(self.recv_path).subscribe(['put'])
         self.want_handle = False
-        print "EM socket between %s <-> %s" % (src, dst)
+        print "EM socket send %s, recv %s" % (send_path, recv_path)
 
     def _fill_recv_buf(self):
         pass

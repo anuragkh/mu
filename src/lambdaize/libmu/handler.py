@@ -218,10 +218,10 @@ def do_connect(msg, vals):
 
         if len(parts) != 4 or parts[0] != "HELLO_STATE":
             return None
-        src = "%s_%d" % (parts[1], int(parts[2]))
-        dst = "%s_%d" % (parts[1], int(parts[3]))
+        to_path = "/excamera/%s/%d_%d" % (parts[1], int(parts[2]), int(parts[3]))
+        from_path = "/excamera/%s/%d_%d" % (parts[1], int(parts[3]), int(parts[2]))
 
-        cs = EMSocketNB(src, dst, vals['cmdsock'].fileno(), host, port)
+        cs = EMSocketNB(to_path, from_path, vals['cmdsock'].fileno(), host, port)
     except Exception as e:  # pylint: disable=broad-except
         vals['cmdsock'].enqueue('FAIL(%s)' % str(e))
         return False
