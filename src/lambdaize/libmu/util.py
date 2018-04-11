@@ -39,12 +39,14 @@ def connect_socket(addr, port, cacert, srvcrt, srvkey):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
-    for attempt in range(10):
+    sleep_time = 0.1
+    for attempt in range(6):
         try:
             s.connect((addr, port))
         except socket.error, exc:
             print "WARN Attempt#%d: socket.error %s (%s:%d)" % (attempt, exc, addr, port)
-            time.sleep(0.1)
+            time.sleep(sleep_time)
+            sleep_time *= 2
         else:
             break
     else:
@@ -121,6 +123,8 @@ def listen_socket(addr, port, cacert, srvcrt, srvkey, nlisten=1):
     ls.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     ls.bind((addr, port))
     ls.listen(nlisten)
+
+    print "Listening on %s:%d with backlog of %d" % (addr, port, nlisten)
 
     if cacert is not None and srvcrt is not None and srvkey is not None:
         ls = sslize(ls, cacert, srvcrt, srvkey, False)

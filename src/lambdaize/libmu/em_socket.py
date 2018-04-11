@@ -56,10 +56,13 @@ class EMSocketNB(SocketNB):
         self.em = ElasticMemClient(host)
         self.send_path = send_path
         self.recv_path = recv_path
+
+        print "Creating/opening"
         try:
             self.kv = self.em.create(self.recv_path, '/tmp')
         except DirectoryServiceException:
             self.kv = self.em.open(self.send_path)
+
         try:
             self.em.fs.create(self.recv_path, '/tmp')
         except DirectoryServiceException:
