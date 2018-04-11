@@ -1,9 +1,9 @@
 #!/bin/bash
 
-FN_NAME="xc-enc_CnF9QOeX"
+FN_NAME="xc-enc_4fbD4GAz"
 REGION="us-east-1"
 public_ip=`wget -qO - http://169.254.169.254/latest/meta-data/public-ipv4`
-echo "IP=[$PUBLIC_IP]"
+echo "IP=[$public_ip]"
 echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
 echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
 echo "AWS_ROLE=$AWS_ROLE"
@@ -19,7 +19,7 @@ if [ -z "$PORTNUM" ]; then
     PORTNUM=13579
 fi
 if [ -z "$STATEPORT" ]; then
-    STATEPORT=6379
+    STATEPORT=9090
 fi
 if [ -z "$STATETHREADS" ]; then
     STATETHREADS=24
