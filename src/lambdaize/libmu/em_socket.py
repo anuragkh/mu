@@ -38,7 +38,6 @@ class EMSocketNB(SocketNB):
             pass
         self.notif = self.em.open_listener(self.recv_path).subscribe(['put'])
         self.want_handle = False
-        print "EM socket send_path=%s, recv_path=%s" % (send_path, recv_path)
 
     def _fill_recv_buf(self):
         pass
